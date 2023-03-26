@@ -178,14 +178,115 @@ const promptAddEmployee = (roles) => {
             db.promise().query("SELECT E.id, CONCAT(E.first_name,' ',E.last_name)as manager from employee E;"
             ).then(([managers]) => {
                 let managerOptions = managers.map(({
+                    id,
+                    manager
                 }) => ({
                     value: id,
                     name: manager
                 }));
-                
+
+                inquirer.prompt(
+                    [{
+                        type:"input",
+                        name: "firstName",
+                        message: "Employee's first name",
+                        validate: firstName => {
+                            if (firstName) {
+                                return true;
+                            } else {
+                                console.log("Please enter first name of employee.");
+                                return false;
+                            }
+                        },
+                        
+                            type: "input",
+                            name: "lastName",
+                            message: "Employee's last name",
+                            validate: lastName => {
+                                if (lastName) {
+                                    return true;
+                                } else {
+                                    console.log("Please enter last name.")
+                                    return false;
+                                }
+                            }
+                        },
+                        {
+                            type: "list",
+                            name: "role",
+                            message: "What is employee's current role?",
+                            choices: titleOptions
+                        },
+                        {
+                            type: "list",
+                            name: "manager",
+                            message: "Who is the employee's manager?",
+                            choices: managerOptions
+                        },
+                    ]) .then(({firstName, lastName, role, manager}) => {
+                        const query = db.query("INSERT into employee set ?",
+                        {
+                            fisrt_name: firstName,
+                            last_name: lastName,
+                            role_id: role,
+                            manager_id: managerOptions
+                        },
+                        function (err, res) {
+                            if (err) throw err;
+                            console.log({role, manager});
+                        }
+                        )
+                    }) 
+                    .then(() => chooseEmployees())
+                    })
+                })
             }
-            
+
+const promptUpdateRole = () => {
+    return db.promise().query("SELECT R.id, R.title, R.salary, R.department_id from role R;"
+    )
+        .then(([roles]) => {
+            let roleOptions = roles.map(({
+                id,
+                title
+            }) => ({
+                value: id,
+                name: title
+            }));
+            inquirer.prompt(
+                [
+                    {
+                        type: "list",
+                        name: "role",
+                        message: "Select which role to update.",
+                        choices: roleOptions
+                    }
+                ]
             )
+                .then(role => {
+                    console.log(role);
+                    inquirer.prompt(
+                        [{
+                            type: "input",
+                            name: "title",
+                            message: "Enter your title.",
+                            validate: titleName => {
+                                if (titleName) {
+                                    return true;
+                                } else {
+                                    console.log("Please enter your title.");
+                                    return false;
+                                }
+                            },
+                        
+                        }
+                    ]
+                    )
+                })
         })
 }
+
+promptTeamMenu();
+
+
 
