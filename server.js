@@ -1,8 +1,7 @@
 const express = require("express");
 const inquirer = require("inquirer");
-const fs = require("fs");
 const mysql = require("mysql2");
-const addTable = require("console.table");
+
 
 
 
@@ -38,6 +37,16 @@ function viewRoles() {
             promptTeamMenu;
         });
 };
+
+function viewEmployees() {
+    db.query("SELECT e.id AS employee_id, e.first_name, e.last_name, d.name AS department_name, r.title AS job_title, r.salary AS salary, CONCAT(m.first_name,' ',m.last_name;",
+        function (err, results) {
+            console.table(results);
+            promptTeamMenu;
+        });
+};
+
+
 
 
 
